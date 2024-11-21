@@ -15,7 +15,6 @@ struct Opts {
 #[enum_dispatch(CommandImpl)]
 #[derive(Parser, Debug)]
 enum SubCommand {
-    Day0(day0::Day0),
     Day1a(day1a::Day1a),
     Day1b(day1b::Day1b),
     Day2a(day2a::Day2a),
