@@ -1,0 +1,13 @@
+version: '3'
+env:
+  DAY: day1a
+  FILE: day1a.txt
+
+tasks:
+  new-day:
+    cmds:
+      - cargo xtask new-day -n $DAY
+
+  run:
+    cmds:
+      - cargo run --bin aoc -- $DAY --input aoc/inputs/$FILE.txt
