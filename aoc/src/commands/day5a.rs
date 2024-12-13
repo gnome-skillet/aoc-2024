@@ -106,7 +106,7 @@ impl SafetyManual {
         return true;
     }
 
-    pub fn reorder_updates(&mut self, mut updates: &mut Vec<Vec<u8>>) {
+    pub fn reorder_updates(&mut self, updates: &mut Vec<Vec<u8>>) {
         for u in updates.iter_mut() {
             self.pair_sort(u);
         }
@@ -135,31 +135,6 @@ impl SafetyManual {
             }
         }
     }
-
-fn find_invalid(updates: &Vec<u8>, index: usize, rules: HashMap<u8,HashSet<u8>>) -> Option<usize> {
-    let curr = updates[i]
-    if rules.contains(&curr) {
-        return None 
-    }
-    for j in 0..i {
-        if rules[v].contains(updates[j]) {
-            return Some(j)
-        }
-    }
-    return None 
-}
-
-fn sort(updates: &Vec<u8>, index: usize, rules: HashMap<u8,HashSet<u8>>) -> Option<usize> {
-    for (i, v) in updates.iter().enumerate() {
-        if let Some(p) = find_invalid(updates, i, rules) {
-            nums = nums[:p]+[nums[i]]+nums[p:i]+nums[i+1:]
-        } else {
-        }
-    }
-    if(p==-1):
-        return nums
-    return mySort(nums, rule)
-}
 
     fn hash_sort(&mut self, updates: &mut Vec<u8>) {
         loop {
@@ -199,12 +174,12 @@ fn sort(updates: &Vec<u8>, index: usize, rules: HashMap<u8,HashSet<u8>>) -> Opti
 
     pub fn filter_ordered(&self, updates: &mut Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         let ordered = self.flag_sorted(updates);
-        updates.iter().enumerate().filter(|(i, x)| ordered[*i]).map(|(_, x)| x.clone()).collect()
+        updates.iter().enumerate().filter(|(i, _)| ordered[*i]).map(|(_, x)| x.clone()).collect()
     }
 
     pub fn filter_unordered(&self, updates: &mut Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         let ordered = self.flag_sorted(updates);
-        updates.iter().enumerate().filter(|(i, x)| !ordered[*i]).map(|(_, x)| x.clone()).collect()
+        updates.iter().enumerate().filter(|(i, _)| !ordered[*i]).map(|(_, x)| x.clone()).collect()
     }
 }
 
@@ -214,7 +189,7 @@ impl CommandImpl for Day5a {
         if let Ok((_, (rules, mut updates))) = parse_problem(&file) {
             let mut safety_manual = SafetyManual::new(rules);
             let mut updates = safety_manual.filter_unordered(&mut updates);
-            let flag_ordered_updates = safety_manual.flag_sorted(&updates);
+            let _flag_ordered_updates = safety_manual.flag_sorted(&updates);
             safety_manual.reorder_updates(&mut updates);
             let sum_middle_values = safety_manual.middle_value_sum(&updates);
             println!("sum of middle values: {sum_middle_values}");

@@ -50,7 +50,7 @@ fn parse_tests(input: &str) -> IResult<&str, Vec<(u64, Vec<u64>)>> {
     Ok((input, rhs))
 }
 
-fn solvable(test_value: u64, operands: &Vec<u64>) -> bool {
+fn solvable(test_value: u64, mut operands: &Vec<u64>) -> bool {
     let base: usize = 2;
     let capacity = operands.len() as u32;
     let mut solution_tree: VecDeque<(usize, u64)> = VecDeque::with_capacity(base.pow(capacity));
