@@ -1,15 +1,12 @@
-use std::{error::Error, path::PathBuf, str::FromStr};
+use std::path::PathBuf;
 
 use clap::Parser;
 use itertools::Itertools;
 
 use nom::lib::std::cmp::Ordering;
-use std::cmp::min;
-use std::fs;
 use std::ops::Range;
 
-use crate::utils::{slurp_file, ParseError};
-use std::collections::HashMap;
+use crate::utils::slurp_file;
 
 use super::{CommandImpl, DynError};
 
@@ -77,7 +74,7 @@ const RADIX: u32 = 10u32;
 
 impl CommandImpl for Day10 {
     fn main(&self) -> Result<(), DynError> {
-        let mut gen_id = (0..u64::MAX);
+        let mut gen_id = 0..u64::MAX;
         let lines: Vec<String> = slurp_file(&self.input)?;
         let topographic_map: Vec<Vec<u32>> =
             lines.iter().map(|c| c.chars().map(|d| d.to_digit(RADIX).unwrap()).collect()).collect();

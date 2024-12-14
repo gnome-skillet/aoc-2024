@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use crate::utils::{slurp_file, ParseError};
+use crate::utils::slurp_file;
 
 use super::{CommandImpl, DynError};
 

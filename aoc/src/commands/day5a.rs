@@ -6,15 +6,13 @@ use std::fs;
 
 use std::collections::{HashMap, HashSet};
 
-use nom::branch::alt;
-use nom::bytes::complete::{tag, take_until};
+use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
 use nom::character::complete::newline;
 use nom::combinator::{map_res, recognize};
 use nom::multi::many1;
 use nom::multi::separated_list1;
-use nom::sequence::delimited;
 use nom::sequence::separated_pair;
 use nom::IResult;
 

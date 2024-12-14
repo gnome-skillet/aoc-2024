@@ -90,13 +90,13 @@ impl Mul for Bits {
     }
 }
 
-fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>>
-where
-    T: Clone,
-{
-    assert!(!v.is_empty());
-    (0..v[0].len()).map(|i| v.iter().map(|inner| inner[i].clone()).collect::<Vec<T>>()).collect()
-}
+//fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>>
+//where
+//    T: Clone,
+//{
+//    assert!(!v.is_empty());
+//    (0..v[0].len()).map(|i| v.iter().map(|inner| inner[i].clone()).collect::<Vec<T>>()).collect()
+//}
 
 pub struct Letters {
     pub letters: Vec<Vec<Bits>>,
@@ -190,20 +190,20 @@ impl Letters {
         x.matches_mas() && y.matches_mas()
     }
 
-    fn vertical_mul(&self, row: usize, col: usize) -> bool {
-        if row > self.letters.len() - 3 {
-            return false;
-        }
-        if col > self.letters[0].len() {
-            return false;
-        }
-        let mut x = Bits::Unknown;
-        for i in row..(row + 3) {
-            x = x * self.letters[i][col];
-        }
-        x.matches_mas()
-    }
-
+    //    fn vertical_mul(&self, row: usize, col: usize) -> bool {
+    //        if row > self.letters.len() - 3 {
+    //            return false;
+    //        }
+    //        if col > self.letters[0].len() {
+    //            return false;
+    //        }
+    //        let mut x = Bits::Unknown;
+    //        for i in row..(row + 3) {
+    //            x = x * self.letters[i][col];
+    //        }
+    //        x.matches_mas()
+    //    }
+    //
     fn horizontal(&self, row: usize, col: usize) -> bool {
         if self.letters.len() == 0 {
             return false;

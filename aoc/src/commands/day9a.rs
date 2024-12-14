@@ -1,4 +1,4 @@
-use std::{error::Error, path::PathBuf, str::FromStr};
+use std::path::PathBuf;
 
 use clap::Parser;
 
@@ -6,8 +6,6 @@ use nom::lib::std::cmp::Ordering;
 use std::cmp::min;
 use std::fs;
 use std::ops::Range;
-
-use crate::utils::{slurp_file, ParseError};
 
 use super::{CommandImpl, DynError};
 

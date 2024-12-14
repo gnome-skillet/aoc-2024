@@ -1,13 +1,10 @@
-use std::{error::Error, path::PathBuf, str::FromStr};
+use std::path::PathBuf;
 
 use clap::Parser;
-use itertools::Itertools;
 use std::fs;
 
-use crate::utils::{slurp_file, ParseError};
-
 use super::{CommandImpl, DynError};
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 
 use nom::bytes::complete::tag;
 use nom::character::complete::digit1;

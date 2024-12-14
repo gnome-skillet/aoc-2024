@@ -4,7 +4,7 @@ use clap::Parser;
 
 use nom::lib::std::cmp::Ordering;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fs;
 use std::ops::Range;
 
@@ -85,7 +85,7 @@ impl CommandImpl for Day11 {
             acc
         });
         println!("stone_map: {:?}", stone_map);
-        for i in 0..n {
+        for _ in 0..n {
             let stonevec: Vec<(String, usize)> =
                 stone_map.iter().map(|(x, i)| morph((x.to_string(), *i))).flatten().collect();
             stone_map = stonevec.iter().fold(HashMap::new(), |mut acc, c| {
