@@ -2,19 +2,17 @@ use std::{error::Error, path::PathBuf, str::FromStr};
 
 use clap::Parser;
 
-use crate::utils::{slurp_file, ParseError};
+use crate::utils::slurp_file;
 
 use super::{CommandImpl, DynError};
 
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::character::complete::digit1;
-use nom::character::complete::newline;
 use nom::multi::many0;
 use nom::sequence::delimited;
 use nom::IResult;
 use regex::Regex;
-use regex::RegexSet;
 //use nom::sequence::preceded;
 
 #[derive(Parser, Debug)]

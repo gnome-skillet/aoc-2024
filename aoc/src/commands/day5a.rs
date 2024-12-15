@@ -10,6 +10,7 @@ use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
 use nom::character::complete::newline;
+use nom::character::complete::space1;
 use nom::combinator::{map_res, recognize};
 use nom::multi::many1;
 use nom::multi::separated_list1;

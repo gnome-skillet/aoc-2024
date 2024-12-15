@@ -14,24 +14,36 @@ pub struct Day12 {
     input: PathBuf,
 }
 
-#[derive(Debug, Copy, Clone, Hash)]
-pub struct Point {
-    color: char,
-    row: usize,
-    col: usize,
+#[derive(Debug, Clone, Hash)]
+pub struct Garden {
+    plants: Vec<Plant>,
 }
 
-impl Point {
-    pub fn new(color: char, row: usize, col: usize) -> Self {
-        Self { color, row, col }
+impl Garden {
+    pub fn new(plants: Vec<Plant>) -> Self {
+        Self { plants }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Hash)]
+pub struct Plant {
+    plant: char,
+    row: usize,
+    col: usize,
+    component: Option<usize>,
+}
+
+impl Plant {
+    pub fn new(plant: char, row: usize, col: usize) -> Self {
+        Self { plant, row, col, component: None }
     }
 
-    pub fn dist(&self, other: &Point) -> usize {
+    pub fn dist(&self, other: &Plant) -> usize {
         self.row.abs_diff(other.row) + self.col.abs_diff(other.col)
     }
 
-    pub fn neighbor(&self, other: &Point) -> bool {
-        self.dist(other) == 1 && self.color == other.color
+    pub fn neighbor(&self, other: &Plant) -> bool {
+        self.dist(other) == 1 && self.plant == other.plant
     }
 }
 
@@ -53,15 +65,15 @@ impl CommandImpl for Day12 {
         let plant_string = fs::read_to_string(&self.input)?;
         let plantvec: Vec<Vec<char>> =
             plant_string.split_whitespace().map(|x| x.chars().collect::<Vec<char>>()).collect();
-        let plots = plantvec
+        let plants = plantvec
             .iter()
             .enumerate()
-            .flat_map(|(x, v)| v.iter().enumerate().map(move |(y, v)| Point::new(*v, x, y)))
-            .collect::<Vec<Point>>();
+            .flat_map(|(x, v)| v.iter().enumerate().map(move |(y, v)| Plant::new(*v, x, y)))
+            .collect::<Vec<Plant>>();
         let mut plantmap: HashMap<char, Vec<(usize, usize)>> = HashMap::new();
-        for plant in plots.iter() {
+        for plant in plants.iter() {
             plantmap
-                .entry(plant.color)
+                .entry(plant.plant)
                 .and_modify(|x| {
                     x.push((plant.row, plant.col));
                 })

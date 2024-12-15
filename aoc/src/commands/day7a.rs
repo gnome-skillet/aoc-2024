@@ -99,7 +99,6 @@ mod test {
         #[case] input: &'static str,
         #[case] expected: usize,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let expression = "190: 10 19";
         let (_, (x, v)) = parse_test(input)?;
         assert_eq!(x, 190u64);
         assert_eq!(v.len(), expected);
@@ -114,7 +113,7 @@ mod test {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let expression = "190: 10 19";
         let (_, (x, v)) = parse_test(input)?;
-        assert!(solvable(x, v));
+        assert!(solvable(x, &v));
         Ok(())
     }
 }

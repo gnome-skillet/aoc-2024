@@ -29,6 +29,7 @@ enum SubCommand {
     Day10(day10::Day10),
     Day11(day11::Day11),
     Day12(day12::Day12),
+    Day14(day14::Day14),
 }
 fn main() -> Result<(), DynError> {
     let opts = Opts::parse();
