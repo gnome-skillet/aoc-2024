@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fs;
 
 use super::{CommandImpl, DynError};
@@ -94,10 +94,4 @@ impl CommandImpl for Day12 {
 
         Ok(())
     }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rstest::*;
 }

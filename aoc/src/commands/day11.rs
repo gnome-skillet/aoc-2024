@@ -2,11 +2,9 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use nom::lib::std::cmp::Ordering;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
-use std::ops::Range;
 
 use super::{CommandImpl, DynError};
 
@@ -14,29 +12,6 @@ use super::{CommandImpl, DynError};
 pub struct Day11 {
     #[clap(long, short)]
     input: PathBuf,
-}
-
-#[derive(Debug, Clone)]
-pub struct Space {
-    id: Option<usize>,
-    range: Range<usize>,
-}
-
-impl PartialEq for Space {
-    fn eq(&self, other: &Self) -> bool {
-        self.range.start == other.range.start
-    }
-}
-
-impl PartialOrd for Space {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.range.start.partial_cmp(&other.range.start)
-    }
-}
-
-#[derive(Debug)]
-pub struct TopographicMap {
-    map: Vec<Vec<Space>>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -71,8 +46,6 @@ impl Node {
 // If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
 // engraved with an even number of digits, it is replaced by two stones. The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
 // If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
-const RADIX: u64 = 10u64;
-
 impl CommandImpl for Day11 {
     fn main(&self) -> Result<(), DynError> {
         let stone_string = fs::read_to_string(&self.input)?;
@@ -119,10 +92,4 @@ pub fn morph(stone: (String, usize)) -> Vec<(String, usize)> {
         let x: u64 = my_int * 2024;
         vec![(x.to_string(), stone.1)]
     }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rstest::*;
 }

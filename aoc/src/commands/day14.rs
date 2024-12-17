@@ -2,29 +2,20 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use nom::branch::alt;
-use nom::bytes::complete::{tag, take_until};
+use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
-use nom::character::complete::newline;
-use nom::character::complete::space0;
 use nom::character::complete::space1;
 use nom::multi::separated_list1;
-use nom::sequence::delimited;
 use nom::sequence::separated_pair;
 use nom::IResult;
 use nom::{
-    character::complete::{char, one_of},
     combinator::{map_res, opt, recognize},
-    multi::{many0, many1},
-    sequence::{preceded, terminated},
+    sequence::preceded,
 };
-use std::collections::HashMap;
 use std::fs;
-use std::ops::Range;
 
 use super::{CommandImpl, DynError};
-use itertools::Itertools;
 
 #[derive(Parser, Debug)]
 pub struct Day14 {
@@ -130,12 +121,6 @@ fn parse_i32(input: &str) -> IResult<&str, i32> {
     Ok((i, number))
 }
 
-fn my_digit(input: &str) -> IResult<&str, u64> {
-    let (input, digits) = digit1(input)?;
-    let x: u64 = digits.parse::<u64>().unwrap();
-    Ok((input, x))
-}
-
 fn count_quadrant(q: usize, robots: &Vec<Robot>) -> usize {
     let mut n: usize = 0;
     let row_range = match q {
@@ -206,7 +191,6 @@ impl CommandImpl for Day14 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use rstest::*;
 
     #[test]
     fn test_parse_point() -> Result<(), Box<dyn std::error::Error>> {
@@ -230,8 +214,8 @@ mod test {
     fn test_parse_robot() -> Result<(), Box<dyn std::error::Error>> {
         let input: &str = "p=3,0 v=-1,-2";
         let (_, r) = parse_robot(input)?;
-        assert_eq!(r.row(), 0usize);
-        assert_eq!(r.column(), 3usize);
+        assert_eq!(r.row(), 0i32);
+        assert_eq!(r.column(), 3i32);
         assert_eq!(r.rowbar(), -2i32);
         assert_eq!(r.colbar(), -1i32);
         Ok(())
@@ -245,8 +229,8 @@ mod test {
         println!("{:?}", robots);
 
         assert_eq!(robots.len(), 2usize);
-        assert_eq!(robots[0].row(), 0usize);
-        assert_eq!(robots[0].column(), 3usize);
+        assert_eq!(robots[0].row(), 0i32);
+        assert_eq!(robots[0].column(), 3i32);
         assert_eq!(robots[0].rowbar(), -2i32);
         assert_eq!(robots[0].colbar(), -1i32);
         Ok(())

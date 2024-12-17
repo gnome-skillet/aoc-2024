@@ -18,29 +18,6 @@ pub struct Day10 {
     input: PathBuf,
 }
 
-#[derive(Debug, Clone)]
-pub struct Space {
-    id: Option<usize>,
-    range: Range<usize>,
-}
-
-impl PartialEq for Space {
-    fn eq(&self, other: &Self) -> bool {
-        self.range.start == other.range.start
-    }
-}
-
-impl PartialOrd for Space {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.range.start.partial_cmp(&other.range.start)
-    }
-}
-
-#[derive(Debug)]
-pub struct TopographicMap {
-    map: Vec<Vec<Space>>,
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct Node {
     id: u64,
@@ -91,10 +68,4 @@ impl CommandImpl for Day10 {
         //println!("hashmap {:?} starts", hashmap);
         Ok(())
     }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rstest::*;
 }

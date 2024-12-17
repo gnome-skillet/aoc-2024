@@ -179,9 +179,3 @@ impl CommandImpl for Day9a {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rstest::*;
-}
