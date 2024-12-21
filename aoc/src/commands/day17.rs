@@ -106,107 +106,116 @@ pub struct Computer {
     register_a: Register,
     register_b: Register,
     register_c: Register,
-    jump_counter: u8,
+    jumped: bool,
     instruction_pointer: usize,
     printed_list: Vec<i32>,
+    reverse_list: Vec<(i32, Register)>,
 }
 
 impl Computer {
     pub fn new(register_a: Register, register_b: Register, register_c: Register) -> Self {
         let printed_list: Vec<i32> = Vec::new();
+        let reverse_list: Vec<(i32, Register)> = Vec::new();
         Self {
             register_a,
             register_b,
             register_c,
-            jump_counter: 0,
+            jumped: false,
             instruction_pointer: 0usize,
             printed_list,
+            reverse_list,
         }
     }
 }
 
 impl Computer {
-    pub fn combo_operand(&self, operand: i32) -> i32 {
-        info!("combo_operand {operand}");
+    pub fn combo_operand(&mut self, operand: i32) -> i32 {
         match operand {
             0 | 1 | 2 | 3 => operand,
-            4 => self.register_a.value().unwrap(),
-            5 => self.register_b.value().unwrap(),
-            6 => self.register_c.value().unwrap(),
+            4 => {
+                self.reverse_list.push((operand, self.register_a));
+                self.register_a.value().unwrap()
+            }
+            5 => {
+                self.reverse_list.push((operand, self.register_b));
+                self.register_b.value().unwrap()
+            }
+            6 => {
+                self.reverse_list.push((operand, self.register_b));
+                self.register_c.value().unwrap()
+            }
             _ => panic!(),
         }
     }
 
     pub fn adv(&mut self, operand: i32) {
-        info!("adv {operand}");
         let numerator: f32 = self.register_a.value().unwrap() as f32;
         let combo: i32 = self.combo_operand(operand);
-        let denominator: f32 = 2.0_f32.powi(operand);
+        let denominator: f32 = 2.0_f32.powi(combo);
         let tmp: f32 = numerator / denominator;
         let result: i32 = tmp.floor() as i32;
+        info!("adv({operand}) {:?} = {result}", self.register_a);
         self.register_a = Register::A(result);
     }
 
-    pub fn bxl(&mut self, _operand: i32) {
-        info!("bxl {_operand}: register-a: {:?}", self.register_a);
+    pub fn bxl(&mut self, operand: i32) {
         let lhs: i32 = self.register_b.value().unwrap();
-        //let rhs: i32 = operand;
-        let result: i32 = lhs ^ 1i32;
+        let result: i32 = lhs ^ operand;
+        info!("bxl {operand}: register {:?} = {lhs} xor {operand} = {result}", self.register_b);
         self.register_b = Register::B(result);
     }
 
     pub fn bst(&mut self, operand: i32) {
-        info!("bst {operand}");
         let combo: i32 = self.combo_operand(operand);
         let result: i32 = combo % 8i32;
+        info!("bst: set {:?} to combo({operand}):{combo} mod 8 = {result}", self.register_b);
         self.register_b = Register::B(result);
     }
 
     pub fn jnz(&mut self, operand: i32) {
-        info!("jnz {operand}");
         let rega_value: i32 = self.register_a.value().unwrap();
         if rega_value == 0 {
+            info!("jnz op: {operand} - no jump");
             return;
         }
         let combo: i32 = operand;
-        self.jump_counter = 1u8;
-        info!("instruction pointer {combo}");
+        self.jumped = true;
+        info!("jnz op: {operand}, reg: {rega_value}, instruction pointer jumped to {combo}");
         self.instruction_pointer = combo as usize;
     }
 
     pub fn bxc(&mut self, _operand: i32) {
-        info!("bxc {_operand}");
         let regb_value: i32 = self.register_b.value().unwrap();
         let regc_value: i32 = self.register_c.value().unwrap();
         let result: i32 = regb_value ^ regc_value;
+        info!("bxc {_operand} - regb:{regb_value} xor regc:{regc_value} = {result}");
         self.register_b = Register::B(result);
     }
 
     pub fn out(&mut self, operand: i32) {
-        info!("out {operand}");
         let combo: i32 = self.combo_operand(operand);
         let result: i32 = combo % 8i32;
-        info!("push {result}");
+        info!("out {operand} - combo {combo} - output {result}");
         self.printed_list.push(result);
     }
 
     pub fn bdv(&mut self, operand: i32) {
-        info!("bdv {operand}");
         let numerator: f32 = self.register_a.value().unwrap() as f32;
         let combo: i32 = self.combo_operand(operand);
-        let denominator: f32 = 2.0_f32.powi(operand);
+        let denominator: f32 = 2.0_f32.powi(combo);
         let tmp: f32 = numerator / denominator;
         let result: i32 = tmp.floor() as i32;
+        info!("bdv({operand}) {:?} = {result}", self.register_b);
         self.register_b = Register::B(result);
     }
 
     pub fn cdv(&mut self, operand: i32) {
-        info!("cdv {operand}");
         let numerator: f32 = self.register_a.value().unwrap() as f32;
         let combo: i32 = self.combo_operand(operand);
-        let denominator: f32 = 2.0_f32.powi(operand);
+        let denominator: f32 = 2.0_f32.powi(combo);
         let tmp: f32 = numerator / denominator;
         let result: i32 = tmp.floor() as i32;
+        info!("cdv({operand}) {:?} = {result}", self.register_c);
         self.register_c = Register::C(result);
     }
 
@@ -216,7 +225,17 @@ impl Computer {
         }
     }
 
+    pub fn print_reverse(&self) {
+        for i in self.reverse_list.iter() {
+            print!("{:?},", i);
+        }
+    }
+
     pub fn run_command(&mut self, command: Command) {
+        //info!(
+        //    "run {:?} - registers {:?}, {:?}, {:?}",
+        //    command, self.register_a, self.register_b, self.register_c
+        //);
         match command {
             Command::ADV(d) => self.adv(d),
             Command::BXL(d) => self.bxl(d),
@@ -227,8 +246,8 @@ impl Computer {
             Command::BDV(d) => self.bdv(d),
             Command::CDV(d) => self.cdv(d),
         }
-        if self.jump_counter > 0 {
-            self.jump_counter = 0;
+        if self.jumped {
+            self.jumped = false;
             return;
         }
         self.instruction_pointer += 1;
@@ -239,6 +258,7 @@ impl Computer {
             let command: Command = commands[self.instruction_pointer];
             self.run_command(command);
         }
+        info!("registers {:?}, {:?}, {:?}", self.register_a, self.register_b, self.register_c);
     }
 }
 
@@ -287,12 +307,13 @@ impl CommandImpl for Day17 {
         let blob_string = fs::read_to_string(&self.input)?;
         let result = match parse_challenge(&blob_string) {
             Ok((input, (registers, commands))) => {
-                info!("registers: {:?}", registers);
                 info!("commands: {:?}", commands);
                 let mut computer: Computer =
                     Computer::new(registers[0], registers[1], registers[2]);
                 computer.run_commands(commands);
                 computer.print_output();
+                println!();
+                computer.print_reverse();
             }
             Err(error) => panic!("Problem opening the file: {error:?}"),
         };
