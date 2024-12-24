@@ -3,10 +3,9 @@ use std::path::PathBuf;
 use clap::Parser;
 
 use env_logger;
-use log::{debug, error, info, log_enabled, Level};
+use log::{debug, info};
 use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
-use nom::character::complete::i32;
 use nom::character::complete::line_ending;
 use nom::character::complete::one_of;
 use nom::character::complete::space1;
@@ -15,7 +14,6 @@ use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
 use nom::sequence::terminated;
 use nom::IResult;
-use std::fmt;
 use std::fs;
 
 use std::collections::VecDeque;
@@ -131,7 +129,7 @@ impl Computer {
 impl Computer {
     pub fn combo_operand(&mut self, operand: i32) -> i32 {
         match operand {
-            0 | 1 | 2 | 3 => operand,
+            0..=3 => operand,
             4 => {
                 self.reverse_list.push((operand, self.register_a));
                 self.register_a.value().unwrap()
@@ -305,8 +303,8 @@ impl CommandImpl for Day17 {
         env_logger::init();
         debug!("main");
         let blob_string = fs::read_to_string(&self.input)?;
-        let result = match parse_challenge(&blob_string) {
-            Ok((input, (registers, commands))) => {
+        match parse_challenge(&blob_string) {
+            Ok((_, (registers, commands))) => {
                 info!("commands: {:?}", commands);
                 let mut computer: Computer =
                     Computer::new(registers[0], registers[1], registers[2]);

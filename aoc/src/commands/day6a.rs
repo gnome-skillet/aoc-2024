@@ -56,7 +56,7 @@ impl Direction {
     }
 }
 
-pub fn exiting_map(d: &Direction, p: &(usize, usize), mapped_area: &Vec<Vec<char>>) -> bool {
+pub fn exiting_map(d: &Direction, p: &(usize, usize), mapped_area: &[Vec<char>]) -> bool {
     match *d {
         Direction::Up => p.0 == 0,
         Direction::Down => p.0 == mapped_area.len() - 1,
@@ -65,7 +65,7 @@ pub fn exiting_map(d: &Direction, p: &(usize, usize), mapped_area: &Vec<Vec<char
     }
 }
 
-pub fn starting_position(mapped_area: &Vec<Vec<char>>) -> Option<((usize, usize), Direction)> {
+pub fn starting_position(mapped_area: &[Vec<char>]) -> Option<((usize, usize), Direction)> {
     for (r, row) in mapped_area.iter().enumerate() {
         for (c, col) in row.iter().enumerate() {
             if *col == '^' {
@@ -76,11 +76,11 @@ pub fn starting_position(mapped_area: &Vec<Vec<char>>) -> Option<((usize, usize)
     None
 }
 
-pub fn blocked(mapped_area: &Vec<Vec<char>>, p: Option<(usize, usize)>) -> bool {
+pub fn blocked(mapped_area: &[Vec<char>], p: Option<(usize, usize)>) -> bool {
     if let Some((row, col)) = p {
         return mapped_area[row][col] == '#';
     };
-    return true;
+    true
 }
 
 impl CommandImpl for Day6a {

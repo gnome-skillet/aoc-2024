@@ -45,7 +45,7 @@ impl CommandImpl for Day2a {
         let reports: Vec<Vec<i32>> =
             lines.iter().map(|s| s.split(" ").flat_map(|x| x.parse::<i32>()).collect()).collect();
         //println!("reports: {:?}", reports);
-        let n_valid: usize = reports.iter().map(|x| is_valid(&x)).filter(|x| *x).count();
+        let n_valid: usize = reports.iter().map(|x| is_valid(x)).filter(|&x| x).count();
 
         println!("there are {:?} valid reports", n_valid);
         Ok(())

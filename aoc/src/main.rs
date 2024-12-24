@@ -26,6 +26,7 @@ enum SubCommand {
     Day6a(day6a::Day6a),
     Day7a(day7a::Day7a),
     Day9a(day9a::Day9a),
+    Day9b(day9b::Day9b),
     Day10(day10::Day10),
     Day11(day11::Day11),
     Day12(day12::Day12),

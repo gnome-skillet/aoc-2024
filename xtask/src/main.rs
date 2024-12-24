@@ -50,7 +50,7 @@ impl CommandImpl for NewDay {
 
         let status = Command::new("cp")
             .current_dir(project_root())
-            .args(&[template.to_str().unwrap(), dest.to_str().unwrap()])
+            .args([template.to_str().unwrap(), dest.to_str().unwrap()])
             .status()?;
         if !status.success() {
             return Err("cargo install failed".into());

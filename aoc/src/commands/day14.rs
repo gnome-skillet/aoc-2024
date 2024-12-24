@@ -63,8 +63,8 @@ impl Robot {
     }
 
     pub fn displace(&mut self) {
-        let nrows: i32 = ROWS as i32;
-        let ncols: i32 = COLUMNS as i32;
+        let nrows: i32 = ROWS;
+        let ncols: i32 = COLUMNS;
         self.row = (self.row + self.rowbar).rem_euclid(nrows);
         self.column = (self.column + self.colbar).rem_euclid(ncols);
     }
@@ -121,7 +121,7 @@ fn parse_i32(input: &str) -> IResult<&str, i32> {
     Ok((i, number))
 }
 
-fn count_quadrant(q: usize, robots: &Vec<Robot>) -> usize {
+fn count_quadrant(q: usize, robots: &[Robot]) -> usize {
     let mut n: usize = 0;
     let row_range = match q {
         1 | 3 => 0i32..MIDROW,
@@ -141,7 +141,7 @@ fn count_quadrant(q: usize, robots: &Vec<Robot>) -> usize {
     n
 }
 
-pub fn show(robots: &Vec<Robot>) {
+pub fn show(robots: &[Robot]) {
     for row in 0..ROWS {
         for col in 0..COLUMNS {
             let mut printed: bool = false;
@@ -156,7 +156,7 @@ pub fn show(robots: &Vec<Robot>) {
                 print!("*");
             }
         }
-        println!("");
+        println!();
     }
 }
 
@@ -177,8 +177,9 @@ impl CommandImpl for Day14 {
         }
 
         let mut nquad: [usize; 4] = [0; 4];
-        for i in 0..4 {
-            nquad[i] = count_quadrant(i + 1, &robots);
+        for (i, item) in nquad.iter_mut().enumerate() {
+            //nquad[i] = count_quadrant(i + 1, &robots);
+            *item = count_quadrant(i + 1, &robots);
         }
         println!("nquad {:?}", nquad);
         let quadprod: usize = nquad.iter().product();

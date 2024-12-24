@@ -23,7 +23,7 @@ pub struct Node {
 
 impl Node {
     pub fn new(id: u64, height: u64, coord: (usize, usize)) -> Self {
-        Self { id: id, height, coord }
+        Self { id, height, coord }
     }
 
     pub fn dist(&self, other: &Self) -> usize {
@@ -31,7 +31,7 @@ impl Node {
     }
 
     pub fn descendent(&self, other: &Self) -> Node {
-        Self { id: self.id.clone(), height: other.height, coord: other.coord }
+        Self { id: self.id, height: other.height, coord: other.coord }
     }
 
     pub fn connected(&self, other: &Self) -> Option<Node> {
@@ -60,7 +60,7 @@ impl CommandImpl for Day11 {
         println!("stone_map: {:?}", stone_map);
         for _ in 0..n {
             let stonevec: Vec<(String, usize)> =
-                stone_map.iter().map(|(x, i)| morph((x.to_string(), *i))).flatten().collect();
+                stone_map.iter().flat_map(|(x, i)| morph((x.to_string(), *i))).collect();
             stone_map = stonevec.iter().fold(HashMap::new(), |mut acc, c| {
                 *acc.entry(c.0.clone()).or_insert(0) += c.1;
                 acc

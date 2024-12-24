@@ -56,7 +56,7 @@ pub fn connected_components(nodes: &[(usize, usize)]) -> Option<(usize, usize)> 
         return Some((nodes.len(), 4 * nodes.len()));
     }
     let ntotal: usize = nodes.len(); // get ntotal
-    let nedges = nodes.into_iter().combinations(2).filter(|x| neighbor(*x[0], *x[1])).count();
+    let nedges = nodes.iter().combinations(2).filter(|x| neighbor(*x[0], *x[1])).count();
     Some((ntotal, 4 * ntotal - 2 * nedges))
 }
 
@@ -77,11 +77,7 @@ impl CommandImpl for Day12 {
                 .and_modify(|x| {
                     x.push((plant.row, plant.col));
                 })
-                .or_insert({
-                    let mut h = Vec::new();
-                    h.push((plant.row, plant.col));
-                    h
-                });
+                .or_insert(vec![(plant.row, plant.col)]);
         }
         for k in plantmap.keys() {
             println!("key: {k}");

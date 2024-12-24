@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::Parser;
 
 use env_logger;
-use log::{debug, error, info, log_enabled, Level};
+use log::debug;
 use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
@@ -29,13 +29,6 @@ fn my_digit(input: &str) -> IResult<&str, usize> {
     Ok((input, x))
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq)]
-pub enum Register {
-    A(i32),
-    B(i32),
-    C(i32),
-}
-
 fn parse_command(input: &str) -> IResult<&str, Point> {
     debug!("parse_command: {input}");
     let (input, command) = separated_pair(my_digit, tag(","), my_digit)(input)?;
@@ -48,11 +41,11 @@ fn parse_corrupted_bytes(input: &str) -> IResult<&str, Vec<Point>> {
     Ok((input, corrupted_bytes))
 }
 
-pub fn largest_row(barriers: &Vec<Point>) -> usize {
+pub fn largest_row(barriers: &[Point]) -> usize {
     *barriers.iter().map(|(r, _)| r).max().unwrap()
 }
 
-pub fn largest_column(barriers: &Vec<Point>) -> usize {
+pub fn largest_column(barriers: &[Point]) -> usize {
     *barriers.iter().map(|(_, c)| c).max().unwrap()
 }
 
@@ -114,9 +107,9 @@ pub struct Maze {
 
 impl Maze {
     pub fn new(barriers: Vec<Point>) -> Self {
-        let nrows: usize = largest_row(&barriers) + 1 as usize;
-        let ncols: usize = largest_column(&barriers) + 1 as usize;
-        let mut visited: HashSet<Point> = HashSet::from_iter(barriers);
+        let nrows: usize = largest_row(&barriers) + 1_usize;
+        let ncols: usize = largest_column(&barriers) + 1_usize;
+        let visited: HashSet<Point> = HashSet::from_iter(barriers);
         Maze { dimension: (nrows, ncols), visited }
     }
 
@@ -169,27 +162,6 @@ impl CommandImpl for Day18 {
             Err(error) => panic!("Problem opening the file: {error:?}"),
         };
 
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rstest::*;
-    #[test]
-    fn test_parse_command() -> Result<(), Box<dyn std::error::Error>> {
-        let input: &str = "4,2";
-        let (_, command) = parse_command(input)?;
-        assert_eq!(command, Command::BXC(2usize));
-        Ok(())
-    }
-
-    #[test]
-    fn test_parse_register() -> Result<(), Box<dyn std::error::Error>> {
-        let input: &str = "Register A: 30";
-        let (_, register) = parse_register(input)?;
-        assert_eq!(register, Register::A(30));
         Ok(())
     }
 }

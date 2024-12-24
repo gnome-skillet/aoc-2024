@@ -62,10 +62,10 @@ pub struct Direction {
     column: i32,
 }
 
-pub fn find_robot(grid: &Vec<Vec<Object>>) -> Option<(usize, usize)> {
-    for i in 0..grid.len() {
-        for j in 0..grid[i].len() {
-            if grid[i][j] == Object::Robot {
+pub fn find_robot(grid: &[Vec<Object>]) -> Option<(usize, usize)> {
+    for (i, g) in grid.iter().enumerate() {
+        for (j, x) in g.iter().enumerate() {
+            if *x == Object::Robot {
                 return Some((i, j));
             }
         }
@@ -176,8 +176,7 @@ fn parse_rows(input: &str) -> IResult<&str, Vec<Vec<Object>>> {
 
 fn parse_moves(input: &str) -> IResult<&str, Vec<Direction>> {
     let (input, commands) = separated_list1(line_ending, parse_move_line)(input)?;
-    let line =
-        commands.into_iter().flatten().map(|c| Direction::new(c)).collect::<Vec<Direction>>();
+    let line = commands.into_iter().flatten().map(Direction::new).collect::<Vec<Direction>>();
     Ok((input, line))
 }
 
@@ -195,7 +194,7 @@ pub fn show(grid: &Grid) {
         for col in 0..grid.grid[0].len() {
             print!("{:?}, ", grid.grid[row][col]);
         }
-        println!("");
+        println!();
     }
 }
 

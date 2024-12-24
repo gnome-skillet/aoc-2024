@@ -34,14 +34,11 @@ impl CommandImpl for Day1a {
         //let sum_diffs: u32 = tuples.iter().map(|x| x.0.abs_diff(x.1)).sum();
         let mut map: HashMap<u32, u32> = HashMap::new();
         for key in right {
-            if map.get(&key) == None {
-                map.insert(key, 0);
-            }
+            map.entry(key).or_insert(0);
             let count = map.get(&key).unwrap();
             map.insert(key, count + 1);
         }
-        let part_b_sum: u32 =
-            left.iter().filter(|x| map.contains_key(&x)).map(|x| x * map[x]).sum();
+        let part_b_sum: u32 = left.iter().filter(|x| map.contains_key(x)).map(|x| x * map[x]).sum();
         //println!("part a: sum diffs is {:?}", sum_diffs);
         println!("part b: sum diffs is {:?}", part_b_sum);
         Ok(())

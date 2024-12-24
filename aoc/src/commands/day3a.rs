@@ -25,8 +25,8 @@ impl CommandImpl for Day3a {
         let re_mult = Regex::new(r"mul\((?<lhs>[0-9]{1,3}),(?<rhs>[0-9]{1,3})\)")?;
         let mut pushable: bool = true;
         let mut products = vec![];
-        for (_, s) in string.iter().enumerate() {
-            for (_, [msg]) in re.captures_iter(&s).map(|c| c.extract()) {
+        for s in string.iter() {
+            for (_, [msg]) in re.captures_iter(s).map(|c| c.extract()) {
                 //println!("{msg}");
                 if msg == "do()" {
                     pushable = true;

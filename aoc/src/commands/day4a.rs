@@ -41,17 +41,11 @@ impl Bits {
     }
 
     pub fn matches(&self) -> bool {
-        match self {
-            Bits::XMAS | Bits::SAMX => true,
-            _ => false,
-        }
+        matches!(self, Bits::XMAS | Bits::SAMX)
     }
 
     pub fn matches_mas(&self) -> bool {
-        match self {
-            Bits::MAS | Bits::SAM => true,
-            _ => false,
-        }
+        matches!(self, Bits::MAS | Bits::SAM)
     }
 }
 
@@ -205,7 +199,7 @@ impl Letters {
     //    }
     //
     fn horizontal(&self, row: usize, col: usize) -> bool {
-        if self.letters.len() == 0 {
+        if self.letters.is_empty() {
             return false;
         }
         if col + 4 > self.letters[0].len() {
@@ -219,7 +213,7 @@ impl Letters {
     }
 
     fn cross_diagonal(&self, row: usize, col: usize) -> bool {
-        if self.letters.len() == 0 {
+        if self.letters.is_empty() {
             return false;
         }
         if row < 3 {
@@ -236,7 +230,7 @@ impl Letters {
     }
 
     fn diagonal(&self, row: usize, col: usize) -> bool {
-        if self.letters.len() == 0 {
+        if self.letters.is_empty() {
             return false;
         }
         if row + 4 > self.letters.len() {
