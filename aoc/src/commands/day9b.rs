@@ -4,11 +4,8 @@ use clap::Parser;
 
 use env_logger;
 use log::debug;
-use nom::lib::std::cmp::Ordering;
-use std::cmp::min;
 use std::collections::VecDeque;
 use std::fs;
-use std::ops::Range;
 
 use super::{CommandImpl, DynError};
 
@@ -120,7 +117,7 @@ impl CommandImpl for Day9b {
         while let Some(top) = file_blocks.pop() {
             let mut swapped: bool = false;
             for i in 1..file_blocks.len() {
-                let abs_diff: usize = file_blocks[i - 1].abs_diff(&file_blocks[i]);
+                //let abs_diff: usize = file_blocks[i - 1].abs_diff(&file_blocks[i]);
                 if file_blocks[i - 1].abs_diff(&file_blocks[i]) >= top.len() {
                     file_blocks.insert(i, top.relocate(file_blocks[i - 1].end()));
                     swapped = true;

@@ -95,20 +95,20 @@ pub struct Maze {
     blueprint: Vec<Vec<Object>>,
     start: DirectedParticle,
     end: Point,
-    vertices: HashMap<Vertex, weight>,
+    vertices: HashMap<Vertex, Weight>,
 }
 
 impl Maze {
     pub fn new(blueprint: Vec<Vec<Object>>, start: DirectedParticle, end: Point) -> Self {
-        let vertices: HashMap<Vertex, weight> = HashMap::new();
+        let vertices: HashMap<Vertex, Weight> = HashMap::new();
         Maze { blueprint, start, end, vertices }
     }
 
-    pub fn add_vertex<T: Into<Point>>(&mut self, lhs: T, rhs: T, w: weight) {
+    pub fn add_vertex<T: Into<Point>>(&mut self, lhs: T, rhs: T, w: Weight) {
         self.vertices.insert((lhs.into(), rhs.into()), w);
     }
 
-    pub fn vertex_weight<T: Into<Point>>(&self, from: T, to: T) -> Option<&weight> {
+    pub fn vertex_Weight<T: Into<Point>>(&self, from: T, to: T) -> Option<&Weight> {
         self.vertices.get(&(from.into(), to.into()))
     }
 
@@ -130,7 +130,7 @@ impl Maze {
 }
 
 type Vertex = (Point, Point);
-type weight = usize;
+type Weight = usize;
 
 #[derive(Debug)]
 pub struct ShortestPath {
@@ -349,7 +349,7 @@ impl CommandImpl for Day16 {
         let blob_string = fs::read_to_string(&self.input)?;
         let Ok((_, rows)) = parse_challenge(&blob_string) else { todo!() };
         if let (Some(start), Some(end)) = (find_start(&rows), find_end(&rows)) {
-            let mut maze: Maze = Maze::new(rows, start, end);
+            let maze: Maze = Maze::new(rows, start, end);
             println!("start: {:?}", maze.start);
             println!("end: {:?}", maze.end);
             let mut shortest_path: ShortestPath = ShortestPath::new(maze);

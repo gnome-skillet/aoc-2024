@@ -14,11 +14,7 @@ use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
 use nom::character::complete::one_of;
-use nom::character::complete::space1;
-use nom::multi::many1;
 use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
-use nom::sequence::terminated;
 use nom::IResult;
 use std::fs;
 
@@ -82,7 +78,7 @@ impl TopographicMap {
         let mut trailheads: VecDeque<Point> = VecDeque::new();
         let mut visited: HashSet<Point> = HashSet::new();
         trailheads.push_back(p);
-        let mut trails: HashSet<Point> = self.trails();
+        let trails: HashSet<Point> = self.trails();
         let mut ntrails: usize = 0;
         while let Some(p) = trailheads.pop_front() {
             let value: u32 = self.trail_map[p.0][p.1];
@@ -107,7 +103,7 @@ impl TopographicMap {
     pub fn count_distinct_trails(&self, p: Point) -> usize {
         let mut trailheads: VecDeque<Point> = VecDeque::new();
         trailheads.push_back(p);
-        let mut trails: HashSet<Point> = self.trails();
+        let trails: HashSet<Point> = self.trails();
         let mut ntrails: usize = 0;
         while let Some(p) = trailheads.pop_front() {
             let value: u32 = self.trail_map[p.0][p.1];
