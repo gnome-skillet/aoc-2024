@@ -7,13 +7,9 @@ use std::collections::VecDeque;
 use strum::IntoEnumIterator; // 0.17.1
 use strum_macros::EnumIter; // 0.17.1
 
-use crate::utils::slurp_file;
-use env_logger;
-use log::{debug, info};
 use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
-use nom::character::complete::one_of;
 use nom::multi::separated_list1;
 use nom::IResult;
 use std::fs;

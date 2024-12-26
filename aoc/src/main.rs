@@ -35,8 +35,9 @@ enum SubCommand {
     Day16(day16::Day16),
     Day17(day17::Day17),
     Day18(day18::Day18),
-    Day23(day23::Day23),
     Day22(day22::Day22),
+    Day23(day23::Day23),
+    Day24(day24::Day24),
     Day25(day25::Day25),
 }
 fn main() -> Result<(), DynError> {
