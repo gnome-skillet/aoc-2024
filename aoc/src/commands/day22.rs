@@ -2,17 +2,11 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use itertools::Itertools;
-use nom::bytes::complete::tag;
-use nom::character::complete::alpha1;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
 use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
 use nom::IResult;
 use std::fs;
-
-use std::collections::HashSet;
 
 use super::{CommandImpl, DynError};
 

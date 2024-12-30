@@ -16,8 +16,6 @@ use nom::sequence::terminated;
 use nom::IResult;
 use std::fs;
 
-use std::collections::VecDeque;
-
 use super::{CommandImpl, DynError};
 
 #[derive(Parser, Debug)]

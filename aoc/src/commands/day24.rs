@@ -2,20 +2,14 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use itertools::Itertools;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_till;
-use nom::bytes::complete::take_while;
-use nom::character::complete::alpha1;
-use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
 use nom::character::complete::one_of;
 use nom::character::complete::space1;
-use nom::character::is_newline;
 use nom::multi::many1;
 use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
 use nom::IResult;
 use std::fs;
 

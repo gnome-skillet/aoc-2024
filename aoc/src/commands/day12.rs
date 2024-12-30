@@ -10,7 +10,6 @@ use strum::IntoEnumIterator; // 0.17.1
 use strum_macros::EnumIter; // 0.17.1
 
 use super::{CommandImpl, DynError};
-use itertools::Itertools;
 
 #[derive(Parser, Debug)]
 pub struct Day12 {
@@ -58,7 +57,7 @@ pub fn connected_components(nodes: &[Node]) -> Option<Vec<(usize, usize)>> {
         return Some(vec![(nodes.len(), 4 * nodes.len())]);
     }
     let mut unevaluated: BTreeSet<Node> = nodes.iter().map(|&x| x).collect();
-    let mut exists: HashSet<Node> = nodes.iter().map(|&x| x).collect();
+    let exists: HashSet<Node> = nodes.iter().map(|&x| x).collect();
     let mut queue: VecDeque<Node> = VecDeque::new();
     let mut values: Vec<(usize, usize)> = Vec::new();
 

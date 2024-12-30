@@ -2,19 +2,10 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use itertools::Itertools;
-use nom::bytes::complete::tag;
-use nom::character::complete::alpha1;
-use nom::character::complete::digit1;
-use nom::{
-    character::complete::one_of,
-    multi::{many0, many1},
-};
+use nom::{character::complete::one_of, multi::many1};
 
 use nom::character::complete::line_ending;
-use nom::character::complete::newline;
 use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
 use nom::IResult;
 use std::fs;
 
@@ -154,7 +145,7 @@ fn parse_locks(input: &str) -> IResult<&str, Vec<Schematic>> {
 impl CommandImpl for Day25 {
     fn main(&self) -> Result<(), DynError> {
         let blob_string = fs::read_to_string(&self.input)?;
-        if let Ok((_, mut schematics)) = parse_locks(&blob_string) {
+        if let Ok((_, schematics)) = parse_locks(&blob_string) {
             let key_lengths: Vec<Vec<usize>> = schematics
                 .iter()
                 .filter(|x| x.is_key())

@@ -1,13 +1,11 @@
 use std::path::PathBuf;
 
 use clap::Parser;
-use itertools::Itertools;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 use strum::IntoEnumIterator; // 0.17.1
 use strum_macros::EnumIter; // 0.17.1
 
-use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::character::complete::line_ending;
 use nom::multi::separated_list1;
