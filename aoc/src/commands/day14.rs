@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::path::PathBuf;
 
 use clap::Parser;
@@ -28,12 +29,7 @@ const MIDROW: i32 = 51;
 const COLUMNS: i32 = 101;
 const MIDCOLUMN: i32 = 50;
 
-#[derive(Debug, Clone, Hash)]
-pub struct Grid {
-    robots: Vec<Robot>,
-}
-
-#[derive(Debug, Copy, Clone, Hash)]
+#[derive(Debug, Copy, Clone)]
 pub struct Robot {
     row: i32,
     column: i32,
@@ -67,6 +63,12 @@ impl Robot {
         let ncols: i32 = COLUMNS;
         self.row = (self.row + self.rowbar).rem_euclid(nrows);
         self.column = (self.column + self.colbar).rem_euclid(ncols);
+    }
+}
+
+impl PartialEq for Robot {
+    fn eq(&self, other: &Self) -> bool {
+        self.row == other.row && self.column == other.column
     }
 }
 
@@ -164,15 +166,9 @@ impl CommandImpl for Day14 {
     fn main(&self) -> Result<(), DynError> {
         let blob_string = fs::read_to_string(&self.input)?;
         let Ok((_, mut robots)) = parse_robots(&blob_string) else { todo!() };
-        for i in 0..1000 {
+        for _i in 0..1000 {
             for robot in robots.iter_mut() {
                 robot.displace();
-            }
-
-            if i > 500 && i < 600 {
-                println!("loop {i}");
-                show(&robots);
-                print!("\x1B[2J");
             }
         }
 
@@ -185,6 +181,19 @@ impl CommandImpl for Day14 {
         let quadprod: usize = nquad.iter().product();
         println!("product {:?}", quadprod);
 
+        let Ok((_, mut robots)) = parse_robots(&blob_string) else { todo!() };
+        for i in 0..10000 {
+            robots.sort_unstable_by_key(|r| (r.row, r.column));
+            for robot in robots.iter_mut() {
+                robot.displace();
+            }
+            let hashset: HashSet<(i32, i32)> =
+                robots.iter().map(|r| (r.row, r.column)).collect::<HashSet<_>>();
+            if hashset.len() == robots.len() {
+                println!("iteration {i}");
+                show(&robots);
+            }
+        }
         Ok(())
     }
 }

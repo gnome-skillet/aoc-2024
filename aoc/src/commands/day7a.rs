@@ -104,15 +104,4 @@ mod test {
         assert_eq!(v.len(), expected);
         Ok(())
     }
-
-    #[rstest]
-    #[case("190: 10 19", 2usize)]
-    fn test_solvable(
-        #[case] input: &'static str,
-        #[case] expected: usize,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let (_, (x, v)) = parse_test(input)?;
-        assert!(solvable(x, &v));
-        Ok(())
-    }
 }

@@ -321,7 +321,6 @@ impl CommandImpl for Day17 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use rstest::*;
     #[test]
     fn test_parse_command() -> Result<(), Box<dyn std::error::Error>> {
         let input: &str = "4,2";

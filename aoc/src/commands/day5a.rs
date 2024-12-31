@@ -31,9 +31,10 @@ fn parse_rule(input: &str) -> IResult<&str, Rule> {
     Ok((input, integers))
 }
 
-fn parse_rules(input: &str) -> IResult<&str, Vec<Rule>> {
+fn parse_rules(input: &str) -> IResult<&str, HashMap<u8, HashSet<u8>>> {
     let (input, paired_rules) = separated_list1(newline, parse_rule)(input)?;
-    Ok((input, paired_rules))
+    let rule_map = create_rule_map(&paired_rules);
+    Ok((input, rule_map))
 }
 
 fn create_rule_map(paired_rules: &[Rule]) -> HashMap<u8, HashSet<u8>> {
@@ -58,43 +59,26 @@ fn parse_updates(input: &str) -> IResult<&str, Vec<Vec<u8>>> {
     Ok((input, updates))
 }
 
-fn parse_problem(input: &str) -> IResult<&str, (Vec<Rule>, Vec<Vec<u8>>)> {
+fn parse_problem(input: &str) -> IResult<&str, (HashMap<u8, HashSet<u8>>, Vec<Vec<u8>>)> {
     let (input, rules) = parse_rules(input)?;
     let (input, _) = many1(newline)(input)?;
     let (input, updates) = parse_updates(input)?;
     Ok((input, (rules, updates)))
 }
 
-fn parse_set_adapter(hashmap: &HashMap<u8, HashSet<u8>>) -> HashMap<u8, u128> {
-    hashmap.iter().map(|(i, v)| (*i, hashset2bitmap(v))).collect::<HashMap<u8, u128>>()
-}
-
-fn hashset2bitmap(hashset: &HashSet<u8>) -> u128 {
-    let mut bitmap: u128 = 0;
-    for x in hashset.iter() {
-        bitmap |= 1u128 << x;
-    }
-    bitmap
-}
-
 pub struct SafetyManual {
-    rules: Vec<Rule>,
+    rules: HashMap<u8, HashSet<u8>>,
 }
 
 impl SafetyManual {
-    pub fn new(rules: Vec<Rule>) -> Self {
+    pub fn new(rules: HashMap<u8, HashSet<u8>>) -> Self {
         Self { rules }
     }
 
-    fn flag_sorted(&self, updates: &[Vec<u8>]) -> Vec<bool> {
-        let rule_map = create_rule_map(&self.rules);
-        updates.iter().map(|u| Self::is_update_ordered(&rule_map, u)).collect::<Vec<bool>>()
-    }
-
-    fn is_update_ordered(rules: &HashMap<u8, HashSet<u8>>, updates: &Vec<u8>) -> bool {
+    fn is_update_ordered(&self, updates: &Vec<u8>) -> bool {
         let mut printed = HashSet::new();
         for page in updates {
-            if let Some(descendent) = rules.get(page) {
+            if let Some(descendent) = self.rules.get(page) {
                 let ncommon = descendent.intersection(&printed).count();
                 if ncommon > 0 {
                     return false;
@@ -105,49 +89,17 @@ impl SafetyManual {
         true
     }
 
-    pub fn reorder_updates(&mut self, updates: &mut [Vec<u8>]) {
-        for u in updates.iter_mut() {
-            self.pair_sort(u);
-        }
-    }
-
-    fn pair_sort(&mut self, updates: &mut [u8]) {
+    fn pair_sort(&self, updates: &mut [u8]) {
         loop {
             let mut swapped = false;
 
-            for &(first, second) in self.rules.iter() {
-                for i in 0..updates.len() {
-                    if updates[i] == second {
-                        for j in i..updates.len() {
-                            if updates[j] == first {
-                                updates.swap(i, j);
-                                swapped = true;
-                                continue;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if !swapped {
-                break;
-            }
-        }
-    }
-
-    fn hash_sort(&mut self, updates: &mut [u8]) {
-        loop {
-            let mut swapped = false;
-
-            for &(first, second) in self.rules.iter() {
-                for i in 0..updates.len() {
-                    if updates[i] == second {
-                        for j in i..updates.len() {
-                            if updates[j] == first {
-                                updates.swap(i, j);
-                                swapped = true;
-                                continue;
-                            }
+            for i in 0..(updates.len() - 1) {
+                for j in i..updates.len() {
+                    if let Some(x) = self.rules.get(&updates[j]) {
+                        if x.contains(&updates[i]) {
+                            updates.swap(i, j);
+                            swapped = true;
+                            continue;
                         }
                     }
                 }
@@ -171,14 +123,14 @@ impl SafetyManual {
         self.middle_values(updates).iter().sum()
     }
 
-    pub fn filter_ordered(&self, updates: &mut [Vec<u8>]) -> Vec<Vec<u8>> {
-        let ordered = self.flag_sorted(updates);
-        updates.iter().enumerate().filter(|(i, _)| ordered[*i]).map(|(_, x)| x.clone()).collect()
+    pub fn filter_unordered(&self, updates: &mut Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+        updates.retain(|x| self.is_update_ordered(x));
+        updates.to_vec()
     }
 
-    pub fn filter_unordered(&self, updates: &mut [Vec<u8>]) -> Vec<Vec<u8>> {
-        let ordered = self.flag_sorted(updates);
-        updates.iter().enumerate().filter(|(i, _)| !ordered[*i]).map(|(_, x)| x.clone()).collect()
+    pub fn filter_ordered(&self, updates: &mut Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+        updates.retain(|x| !self.is_update_ordered(x));
+        updates.to_vec()
     }
 }
 
@@ -186,15 +138,63 @@ impl CommandImpl for Day5a {
     fn main(&self) -> Result<(), DynError> {
         let file = fs::read_to_string(&self.input)?;
         if let Ok((_, (rules, mut updates))) = parse_problem(&file) {
-            let mut safety_manual = SafetyManual::new(rules);
-            let mut updates = safety_manual.filter_unordered(&mut updates);
-            let _flag_ordered_updates = safety_manual.flag_sorted(&updates);
-            safety_manual.reorder_updates(&mut updates);
+            let safety_manual = SafetyManual::new(rules);
+            let mut updates = safety_manual.filter_ordered(&mut updates);
+            updates.iter_mut().for_each(|x| safety_manual.pair_sort(x));
             let sum_middle_values = safety_manual.middle_value_sum(&updates);
             println!("sum of middle values: {sum_middle_values}");
         } else {
             println!("error");
         }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_parse_point() -> Result<(), Box<dyn std::error::Error>> {
+        let input: &str = "47|53
+97|13
+97|61
+97|47
+75|29
+61|13
+75|53
+29|13
+97|29
+53|29
+61|53
+97|53
+61|29
+47|13
+75|47
+97|75
+47|61
+75|61
+47|29
+75|13
+53|13";
+        let (_, rules) = parse_rules(input)?;
+        let updates: Vec<u8> = vec![75, 47, 61, 53, 29];
+        let safety_manual = SafetyManual::new(rules);
+        assert!(safety_manual.is_update_ordered(&updates));
+        let updates: Vec<u8> = vec![97, 61, 53, 29, 13];
+        assert!(safety_manual.is_update_ordered(&updates));
+        let updates: Vec<u8> = vec![75, 29, 13];
+        assert!(safety_manual.is_update_ordered(&updates));
+        let updates: Vec<u8> = vec![75, 97, 47, 61, 53];
+        assert!(!safety_manual.is_update_ordered(&updates));
+        let updates: Vec<u8> = vec![61, 13, 29];
+        assert!(!safety_manual.is_update_ordered(&updates));
+        let updates: Vec<u8> = vec![97, 13, 75, 29, 47];
+        assert!(!safety_manual.is_update_ordered(&updates));
+        let mut updates: Vec<u8> = vec![75, 97, 47, 61, 53];
+        safety_manual.pair_sort(&mut updates);
+        let expected: Vec<u8> = vec![97, 75, 47, 61, 53];
+        assert_eq!(updates, expected);
         Ok(())
     }
 }

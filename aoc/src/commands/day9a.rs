@@ -17,12 +17,6 @@ pub struct Day9a {
     input: PathBuf,
 }
 
-fn decompress(_disk_map: &Vec<usize>) -> Vec<usize> {
-    //let file_size: usize = disk_map.iter().map(|x| *x as usize).sum();
-    let file_map: Vec<usize> = Vec::new();
-    file_map
-}
-
 #[derive(Debug, Clone)]
 pub struct Space {
     id: Option<usize>,
@@ -43,7 +37,7 @@ impl PartialOrd for Space {
 
 impl Space {
     pub fn new(id: Option<usize>, start: usize, nblocks: usize) -> Self {
-        Self { id, range: Range { start: start, end: (start + nblocks) } }
+        Self { id, range: Range { start, end: (start + nblocks) } }
     }
 
     pub fn free_block(&self) -> bool {
@@ -101,7 +95,7 @@ impl FileBlocks {
     }
 
     pub fn free_space(&self) -> bool {
-        self.free_blocks.len() > 0
+        self.free_blocks.is_empty()
     }
 
     pub fn compress(&mut self) {

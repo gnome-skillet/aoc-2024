@@ -62,10 +62,10 @@ pub struct Direction {
     column: i32,
 }
 
-pub fn find_robot(grid: &[Vec<Object>]) -> Option<(usize, usize)> {
-    for (i, g) in grid.iter().enumerate() {
-        for (j, x) in g.iter().enumerate() {
-            if *x == Object::Robot {
+pub fn find_robot(grid: &Vec<Vec<Object>>) -> Option<(usize, usize)> {
+    for i in 0..grid.len() {
+        for j in 0..grid[i].len() {
+            if grid[i][j] == Object::Robot {
                 return Some((i, j));
             }
         }
@@ -153,13 +153,14 @@ use regex::Regex;
 fn parse_row(input: &str) -> IResult<&str, Vec<Object>> {
     let (input, row) = many1(one_of("#.@O"))(input)?;
     let s: String = row.into_iter().collect();
-    let re = Regex::new(r"(?<space>[\.\#])").unwrap();
-    let after = re.replace_all(&s, "$space$space");
-    let re = Regex::new(r"(?<box>O)").unwrap();
-    let after = re.replace_all(&after, "[]");
-    let re = Regex::new(r"(?<robot>@)").unwrap();
-    let after = re.replace_all(&after, "@.");
-    let after_chars: Vec<char> = after.chars().collect();
+    //let re = Regex::new(r"(?<space>[\.\#])").unwrap();
+    //let after = re.replace_all(&s, "$space$space");
+    //let re = Regex::new(r"(?<box>O)").unwrap();
+    //let after = re.replace_all(&after, "[]");
+    //let re = Regex::new(r"(?<robot>@)").unwrap();
+    //let after = re.replace_all(&after, "@.");
+    //let after_chars: Vec<char> = after.chars().collect();
+    let after_chars: Vec<char> = s.chars().collect();
     let objects: Vec<Object> = after_chars.iter().map(|x| Object::new(*x)).collect::<Vec<Object>>();
     Ok((input, objects))
 }
@@ -176,7 +177,8 @@ fn parse_rows(input: &str) -> IResult<&str, Vec<Vec<Object>>> {
 
 fn parse_moves(input: &str) -> IResult<&str, Vec<Direction>> {
     let (input, commands) = separated_list1(line_ending, parse_move_line)(input)?;
-    let line = commands.into_iter().flatten().map(Direction::new).collect::<Vec<Direction>>();
+    let line =
+        commands.into_iter().flatten().map(|c| Direction::new(c)).collect::<Vec<Direction>>();
     Ok((input, line))
 }
 
@@ -194,7 +196,7 @@ pub fn show(grid: &Grid) {
         for col in 0..grid.grid[0].len() {
             print!("{:?}, ", grid.grid[row][col]);
         }
-        println!();
+        println!("");
     }
 }
 

@@ -86,7 +86,7 @@ impl CommandImpl for Day23 {
                     && vertices.contains(&(x.clone(), z.clone()).swap())
                     && vertices.contains(&(y.clone(), z.clone()).swap())
             };
-            let nodes = vertices.iter().map(|x| x.unwrap()).flatten().collect::<HashSet<Node>>();
+            let nodes = vertices.iter().flat_map(|x| x.unwrap()).collect::<HashSet<Node>>();
             let ntriplets: usize = nodes
                 .iter()
                 .combinations(3)

@@ -4,6 +4,8 @@ use clap::Parser;
 
 use crate::utils::slurp_file;
 
+use itertools::Itertools;
+
 use super::{CommandImpl, DynError};
 
 use std::collections::HashSet;
@@ -18,69 +20,136 @@ pub fn differences(vec: &[i32]) -> Vec<i32> {
     vec.windows(2).map(|w| w[1] - w[0]).collect()
 }
 
-#[derive(Debug, Eq, PartialEq)]
-pub enum Direction {
-    Up,
-    Right,
-    Down,
-    Left,
+#[derive(Clone, Copy, Eq, Debug, Hash, PartialEq)]
+pub enum DirectedParticle {
+    East(usize, usize),
+    South(usize, usize),
+    West(usize, usize),
+    North(usize, usize),
 }
 
-impl Direction {
-    pub fn new(c: char) -> Self {
-        match c {
-            '^' => Direction::Up,
-            '>' => Direction::Right,
-            'V' => Direction::Down,
-            '<' => Direction::Left,
-            _ => panic!(),
-        }
+impl DirectedParticle {
+    pub fn new(r: usize, c: usize) -> Self {
+        DirectedParticle::North(r, c)
     }
 
-    pub fn advance(&self, p: (usize, usize)) -> (usize, usize) {
+    pub fn advance(&self) -> Self {
         match *self {
-            Direction::Up => (p.0 - 1, p.1),
-            Direction::Right => (p.0, p.1 + 1),
-            Direction::Down => (p.0 + 1, p.1),
-            Direction::Left => (p.0, p.1 - 1),
+            DirectedParticle::North(r, c) => DirectedParticle::North(r - 1, c),
+            DirectedParticle::East(r, c) => DirectedParticle::East(r, c + 1),
+            DirectedParticle::South(r, c) => DirectedParticle::South(r + 1, c),
+            DirectedParticle::West(r, c) => DirectedParticle::West(r, c - 1),
         }
     }
 
     pub fn rotate(self) -> Self {
         match self {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
+            DirectedParticle::North(r, c) => DirectedParticle::East(r, c),
+            DirectedParticle::East(r, c) => DirectedParticle::South(r, c),
+            DirectedParticle::South(r, c) => DirectedParticle::West(r, c),
+            DirectedParticle::West(r, c) => DirectedParticle::North(r, c),
+        }
+    }
+    pub fn row(&self) -> usize {
+        match *self {
+            DirectedParticle::North(r, _) => r,
+            DirectedParticle::East(r, _) => r,
+            DirectedParticle::South(r, _) => r,
+            DirectedParticle::West(r, _) => r,
+        }
+    }
+
+    pub fn column(&self) -> usize {
+        match *self {
+            DirectedParticle::North(_, c) => c,
+            DirectedParticle::East(_, c) => c,
+            DirectedParticle::South(_, c) => c,
+            DirectedParticle::West(_, c) => c,
+        }
+    }
+
+    pub fn coord(&self) -> (usize, usize) {
+        match *self {
+            DirectedParticle::North(r, c) => (r, c),
+            DirectedParticle::East(r, c) => (r, c),
+            DirectedParticle::South(r, c) => (r, c),
+            DirectedParticle::West(r, c) => (r, c),
+        }
+    }
+    pub fn exiting_map(&self, dimensions: &(usize, usize)) -> bool {
+        match *self {
+            DirectedParticle::North(r, _) => r == 0,
+            DirectedParticle::South(r, _) => r == dimensions.0 - 1,
+            DirectedParticle::West(_, c) => c == 0,
+            DirectedParticle::East(_, c) => c == dimensions.1 - 1,
         }
     }
 }
 
-pub fn exiting_map(d: &Direction, p: &(usize, usize), mapped_area: &[Vec<char>]) -> bool {
-    match *d {
-        Direction::Up => p.0 == 0,
-        Direction::Down => p.0 == mapped_area.len() - 1,
-        Direction::Left => p.1 == 0,
-        Direction::Right => p.1 == mapped_area[0].len() - 1,
-    }
-}
-
-pub fn starting_position(mapped_area: &[Vec<char>]) -> Option<((usize, usize), Direction)> {
+pub fn starting_position(mapped_area: &[Vec<char>]) -> Option<DirectedParticle> {
     for (r, row) in mapped_area.iter().enumerate() {
         for (c, col) in row.iter().enumerate() {
             if *col == '^' {
-                return Some(((r, c), Direction::new(*col)));
+                return Some(DirectedParticle::new(r, c));
             }
         }
     }
     None
 }
 
-pub fn blocked(mapped_area: &[Vec<char>], p: Option<(usize, usize)>) -> bool {
-    if let Some((row, col)) = p {
-        return mapped_area[row][col] == '#';
-    };
-    true
+pub fn obstacles(mapped_area: &[Vec<char>]) -> HashSet<(usize, usize)> {
+    (0..mapped_area.len())
+        .cartesian_product(0..mapped_area[0].len())
+        .filter(|p| mapped_area[p.0][p.1] == '#')
+        .collect::<HashSet<(usize, usize)>>()
+}
+
+pub fn dimensions(mapped_area: &[Vec<char>]) -> (usize, usize) {
+    (mapped_area.len(), mapped_area[0].len())
+}
+
+pub fn simulate(
+    start: DirectedParticle,
+    obstacles: &HashSet<(usize, usize)>,
+    dimensions: &(usize, usize),
+) -> HashSet<(usize, usize)> {
+    let mut visited: HashSet<(usize, usize)> = HashSet::new();
+    let mut guard = start;
+
+    visited.insert(guard.coord());
+    while !guard.exiting_map(dimensions) {
+        let next_p = guard.advance();
+        if !obstacles.contains(&next_p.coord()) {
+            guard = next_p;
+            visited.insert(guard.coord());
+        } else {
+            guard = guard.rotate();
+        }
+    }
+    visited
+}
+
+pub fn stuck_in_a_loop(
+    start: DirectedParticle,
+    obstacles: &HashSet<(usize, usize)>,
+    dimensions: &(usize, usize),
+) -> bool {
+    let mut visited: HashSet<DirectedParticle> = HashSet::new();
+    let mut guard: DirectedParticle = start;
+
+    visited.insert(guard);
+    while !guard.exiting_map(dimensions) {
+        let next_p = guard.advance();
+        if visited.contains(&next_p) {
+            return true;
+        } else if !obstacles.contains(&next_p.coord()) {
+            guard = next_p;
+            visited.insert(guard);
+        } else {
+            guard = guard.rotate();
+        }
+    }
+    false
 }
 
 impl CommandImpl for Day6a {
@@ -88,21 +157,22 @@ impl CommandImpl for Day6a {
         let lines: Vec<String> = slurp_file(&self.input)?;
         let mapped_area: Vec<Vec<char>> =
             lines.iter().map(|s| s.split("").flat_map(|x| x.parse::<char>()).collect()).collect();
-        let mut visited: HashSet<(usize, usize)> = HashSet::new();
-        if let Some((mut p, mut d)) = starting_position(&mapped_area) {
-            visited.insert(p);
-            while !exiting_map(&d, &p, &mapped_area) {
-                let next_p = d.advance(p);
-                if !blocked(&mapped_area, Some(next_p)) {
-                    p = next_p;
-                    visited.insert(p);
-                } else {
-                    d = d.rotate();
+        let mut obstacles = obstacles(&mapped_area);
+        let dimensions = dimensions(&mapped_area);
+        let mut nloops: usize = 0usize;
+        if let Some(guard) = starting_position(&mapped_area) {
+            let visited = simulate(guard, &obstacles, &dimensions);
+            println!("guard visited {:?} unique positions", visited.len());
+            for p in visited.iter() {
+                obstacles.insert(*p);
+                if stuck_in_a_loop(guard, &obstacles, &dimensions) {
+                    nloops += 1;
                 }
+                obstacles.remove(p);
             }
+            println!("there are {nloops} loops");
         }
 
-        println!("visited {:?} unique positions", visited.len());
         Ok(())
     }
 }

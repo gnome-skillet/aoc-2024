@@ -51,9 +51,9 @@ pub trait KeyHeightable {
 impl LockHeightable for Lock {
     fn lock_heights(&self) -> Option<Vec<usize>> {
         let mut heights: Vec<usize> = Vec::new();
-        for (_, row) in self.iter().enumerate() {
+        for row in self.iter() {
             let mut index: usize = 0;
-            for (_, val) in row.iter().enumerate() {
+            for val in row.iter() {
                 if *val != '#' {
                     break;
                 }
@@ -71,9 +71,9 @@ impl LockHeightable for Lock {
 impl KeyHeightable for Key {
     fn key_heights(&self) -> Option<Vec<usize>> {
         let mut heights: Vec<usize> = Vec::new();
-        for (_, row) in self.iter().enumerate() {
+        for row in self.iter() {
             let mut index: usize = 0;
-            for (_, val) in row.iter().enumerate() {
+            for val in row.iter() {
                 if *val == '#' {
                     break;
                 }
@@ -159,7 +159,7 @@ impl CommandImpl for Day25 {
             let mut num_fits: usize = 0;
             for key in key_lengths.iter() {
                 for lock in lock_lengths.iter() {
-                    if key.fits(&lock) {
+                    if key.fits(lock) {
                         num_fits += 1;
                     }
                 }
@@ -179,7 +179,6 @@ impl CommandImpl for Day25 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use rstest::*;
 
     #[test]
     fn test_first_lock() -> Result<(), Box<dyn std::error::Error>> {

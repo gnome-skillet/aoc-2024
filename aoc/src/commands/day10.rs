@@ -40,10 +40,9 @@ impl TopographicMap {
             .trail_map
             .iter()
             .enumerate()
-            .map(|(r, x)| {
+            .flat_map(|(r, x)| {
                 x.iter().enumerate().filter(|&(_, &val)| val == 0).map(move |(c, _)| (r, c))
             })
-            .flatten()
             .collect();
         zeroes
     }
@@ -52,10 +51,9 @@ impl TopographicMap {
         self.trail_map
             .iter()
             .enumerate()
-            .map(|(r, x)| {
+            .flat_map(|(r, x)| {
                 x.iter().enumerate().filter(|&(_, &val)| val != 0).map(move |(c, _)| (r, c))
             })
-            .flatten()
             .collect()
     }
 

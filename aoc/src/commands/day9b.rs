@@ -25,6 +25,9 @@ pub trait Blockable {
     fn start(&self) -> usize;
     fn end(&self) -> usize;
     fn len(&self) -> usize;
+    fn is_empty(&self) -> bool {
+        self.len() == 0usize
+    }
 }
 
 pub trait Subtractable {
@@ -47,8 +50,7 @@ pub type Block = (usize, usize, usize);
 
 impl CheckSummable for Block {
     fn checksum(&self) -> usize {
-        let cs = (self.start()..self.end()).map(|i| i * self.id()).sum();
-        cs
+        (self.start()..self.end()).map(|i| i * self.id()).sum()
     }
 }
 
@@ -103,13 +105,12 @@ impl CommandImpl for Day9b {
         let mut file_blocks: Vec<Block> = disk_map
             .iter()
             .enumerate()
-            .map(|(i, v)| {
+            .filter_map(|(i, v)| {
                 let block: Option<Block> =
                     if i % 2 == 0 { Some((block_offset, block_offset + *v, i / 2)) } else { None };
                 block_offset += *v;
                 block
             })
-            .flatten()
             .collect::<Vec<Block>>();
 
         let mut final_queue: VecDeque<Block> = VecDeque::new();
@@ -124,7 +125,7 @@ impl CommandImpl for Day9b {
                     break;
                 }
             }
-            if file_blocks.len() == 0 {
+            if file_blocks.is_empty() {
                 final_queue.push_front(top);
             } else if !swapped {
                 let last = file_blocks.len() - 1;

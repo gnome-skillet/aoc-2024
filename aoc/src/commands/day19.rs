@@ -31,7 +31,7 @@ pub enum Stripe {
 }
 
 impl Stripe {
-    pub fn new(patterns: &str) -> Vec<Stripe> {
+    pub fn new(_patterns: &str) -> Vec<Stripe> {
         todo!()
     }
 }
@@ -40,7 +40,7 @@ pub type Towel = Vec<Stripe>;
 
 fn parse_available_towel_patterns(input: &str) -> IResult<&str, HashSet<&str>> {
     let (input, patterns) = separated_list1(tag(", "), alpha1)(input)?;
-    let patterns: HashSet<&str> = HashSet::from_iter(patterns.iter().map(|&x| x));
+    let patterns: HashSet<&str> = HashSet::from_iter(patterns.iter().copied());
     Ok((input, patterns))
 }
 
@@ -75,7 +75,6 @@ impl<'a> Designable<'a> for PatternBuilder<'a> {
     fn designable(&self, design: &'a str) -> bool {
         let mut queue: VecDeque<usize> = VecDeque::new();
         let string = design.to_string();
-        let mut memoizer: HashSet<usize> = HashSet::new();
         queue.push_back(0usize);
         while let Some(offset) = queue.pop_front() {
             if offset == string.len() {
@@ -87,7 +86,7 @@ impl<'a> Designable<'a> for PatternBuilder<'a> {
             for prefix in self.patterns.iter() {
                 if string[offset..].starts_with(prefix) {
                     let new_offset: usize = offset + prefix.len();
-                    if !memoizer.contains(&new_offset) && new_offset <= string.len() {
+                    if new_offset <= string.len() {
                         queue.push_back(offset + prefix.len());
                     }
                 }
@@ -104,7 +103,7 @@ impl CommandImpl for Day19 {
 
         if let Ok((_, (mut patterns, designs))) = parse_challenge(&blob_string) {
             let smaller_patterns: HashSet<&str> =
-                HashSet::from_iter(patterns.iter().filter(|&x| x.len() <= 2).map(|&x| x));
+                HashSet::from_iter(patterns.iter().filter(|&x| x.len() <= 2).copied());
             let pattern_builder = PatternBuilder::new(smaller_patterns);
             patterns.retain(|&x| x.len() <= 2 || !pattern_builder.designable(x));
 
