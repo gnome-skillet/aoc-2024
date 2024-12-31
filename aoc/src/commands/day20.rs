@@ -6,7 +6,6 @@ use nom::multi::separated_list1;
 use nom::IResult;
 use nom::{character::complete::one_of, multi::many1};
 
-use strum::IntoEnumIterator; // 0.17.1
 use strum_macros::EnumIter; // 0.17.1
 
 use itertools::Itertools;
@@ -71,7 +70,7 @@ pub trait Cheatable {
 impl Neighborable for Point {
     type Item = Point;
 
-    fn neighborhood(&self, nrows: usize, ncols: usize) -> impl Iterator<Item = Point> {
+    fn neighborhood(&self, nrows: usize, ncols: usize) -> impl Iterator<Item = (usize, usize)> {
         let minrow: usize = if self.row() == 0 { self.row() } else { self.row() - 1 };
         let mincol: usize = if self.column() == 0 { self.column() } else { self.column() - 1 };
         let maxrow: usize = if self.row() == nrows - 1 { self.row() } else { self.row() + 1 };
@@ -230,7 +229,7 @@ impl ShortestPath {
         queue.push_back((self.maze.start, current_score));
 
         while !queue.is_empty() {
-            if let Some((mut top, score)) = queue.pop_front() {
+            if let Some((top, score)) = queue.pop_front() {
                 if self.maze.goal_reached(&top) && score < best_score {
                     best_score = score;
                 } else {
@@ -251,7 +250,7 @@ impl ShortestPath {
             .maze
             .blueprint
             .iter()
-            .map(|x| x.iter().map(|x| usize::MAX).collect::<Vec<usize>>())
+            .map(|x| x.iter().map(|_x| usize::MAX).collect::<Vec<usize>>())
             .collect::<Vec<Vec<usize>>>();
         let mut visited: HashSet<Point> = HashSet::new();
         let nrows: usize = self.maze.nrows();
@@ -270,7 +269,6 @@ impl ShortestPath {
                 }
             }
         }
-        let score: usize = dm[self.maze.start.0][self.maze.start.1];
         dm
     }
 
@@ -279,7 +277,6 @@ impl ShortestPath {
         let nrows: usize = self.maze.nrows();
         let ncols: usize = self.maze.ncols();
         let mut improvements: HashMap<usize, usize> = HashMap::new();
-        let mut ncount: usize = 0usize;
         queue.push_back(self.maze.start);
         while let Some(point) = queue.pop_front() {
             let nsteps: usize = dm[point.0][point.1];
@@ -327,9 +324,3 @@ impl CommandImpl for Day20 {
         Ok(())
     }
 }
-//
-//#[cfg(test)]
-//mod test {
-//    use super::*;
-//    use rstest::*;
-//}

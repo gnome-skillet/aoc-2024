@@ -2,7 +2,6 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use itertools::Itertools;
 use nom::character::complete::line_ending;
 use nom::multi::separated_list1;
 use nom::IResult;
@@ -11,7 +10,6 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fs;
 
-use std::collections::HashSet;
 use std::collections::VecDeque;
 
 use super::{CommandImpl, DynError};
@@ -226,7 +224,7 @@ impl ShortestPath {
                     }
                 } else {
                     for i in 0..4 {
-                        let mut penalty: usize = match i {
+                        let penalty: usize = match i {
                             1 | 3 => 1,
                             2 => 2,
                             _ => 0,

@@ -179,7 +179,6 @@ impl CommandImpl for Day25 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use rstest::*;
 
     #[test]
     fn test_first_lock() -> Result<(), Box<dyn std::error::Error>> {

@@ -30,6 +30,7 @@ enum SubCommand {
     Day10(day10::Day10),
     Day11(day11::Day11),
     Day12(day12::Day12),
+    Day13(day13::Day13),
     Day14(day14::Day14),
     Day15(day15::Day15),
     Day16(day16::Day16),

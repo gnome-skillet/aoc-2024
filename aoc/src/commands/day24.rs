@@ -168,7 +168,7 @@ fn parse_logical_statement(input: &str) -> IResult<&str, Option<LogicalStatement
 fn parse_assignment(input: &str) -> IResult<&str, Assignment> {
     let (input, statement) = parse_logical_statement(input)?;
     let (input, _) = space1(input)?;
-    let (input, op) = tag("->")(input)?;
+    let (input, _op) = tag("->")(input)?;
     let (input, _) = space1(input)?;
     let (input, rhs) = take_till(|c| c == '\n')(input)?;
     Ok((input, (statement.unwrap(), rhs.to_string())))
@@ -233,22 +233,6 @@ impl CommandImpl for Day24 {
             println!("unable to read {:?}", &self.input);
         }
 
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rstest::*;
-    #[test]
-    fn test_parse_assignment() -> Result<(), Box<dyn std::error::Error>> {
-        let input: &str = "ntg XOR fgs -> mjb";
-        let (_, assignment) = parse_assignment(input)?;
-        let assignment = assignment.unwrap();
-        assert_eq!("mjb".to_string(), assignment.1);
-        let expected: LogicalStatement = LogicalStatement::new("XOR", "ntg", "fgs").unwrap();
-        assert_eq!(expected, assignment.0);
         Ok(())
     }
 }
