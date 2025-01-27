@@ -11,3 +11,11 @@ tasks:
   run:
     cmds:
       - cargo run --bin aoc -- $DAY --input aoc/inputs/$FILE.txt
+
+  run-info:
+    cmds:
+      - RUST_LOG=info cargo run --bin aoc -- $DAY --input aoc/inputs/$FILE.txt
+
+  run-debug:
+    cmds:
+      - RUST_LOG=debug cargo run --bin aoc -- $DAY --input aoc/inputs/$FILE.txt
